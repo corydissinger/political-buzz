@@ -1,0 +1,31 @@
+<div class="details-container" id="details-container">
+	<div class="details-header">
+		<div class="display-name">
+		Speaker: <%= @statementdetails['speaker']['display_name'] %>	
+		</div>		
+		<div class="date">
+		Date Spoken: <%= @statementdetails['date'] %>
+		</div>
+	</div>
+	<div class="details-body">
+		<p class="details-text">"<%= @statementdetails['text'] %>"</p>
+		<a style="text-align: center;" href="<%= @statementdetails['transcript_source_url']%>">Transcript Source</a>		
+	</div>
+	<div class="relavent-links">
+		<h1>Categories Found From Statement</h1>
+		<% @categoryUrlHash.each_pair do |key, val| %>
+			<div class="category">
+				<h2><%= key %></h2>
+				<div class="links">
+					<% if not val.empty? %>
+						<% val.each do |url|%>
+							<a style="text-align: center;" href="<%= url %>"><%= url %></a></br>					
+						<% end %>
+					<% else %>
+						No NPR articles found for this category!
+					<% end %>
+				</div>
+			</div>				
+		<% end %>
+	</div>
+</div>

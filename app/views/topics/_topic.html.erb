@@ -1,0 +1,18 @@
+<div class="topic">
+	<div class="topic-info">
+		<h1 class="topic-name">
+		<%= topic.name %> 
+		</h1>
+		<h1 class="topic-count">
+		Number of Statements: <%= topic.count %>
+		</h1>
+	</div>
+	<div class="topic-details">
+		<%= button_to("Details", {:controller => "statements", :action => "index", :name => topic.name},
+										 {:style => "position: relative;
+										 			font-size: 20px;
+										 			background-color: white;
+										 			height: 30%;
+										 			margin: 40% 0% 40% 0%;"}) %>
+	</div>
+</div>
