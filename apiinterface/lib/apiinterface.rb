@@ -79,8 +79,16 @@ module ApiInterface
     def getJson(targetUrl)
       url = URI.parse(URI.encode(targetUrl))
       resp = Net::HTTP.get_response(url) 
-      data = resp.body 
-      result = JSON.parse(data)    
+      data = resp.body
+      result = {} 
+
+      begin
+        result = JSON.parse(data)    
+      rescue Exception => e
+        puts 'Encountered following exception' + e
+        puts 'getJsonBy failed - The following input returned no parseable JSON'
+        puts targetUrl
+      end
   
       return result    
     end
@@ -94,8 +102,18 @@ module ApiInterface
       
       http = Net::HTTP.new(uri.host, uri.port)
       response = http.request(request)
+      result = {}
 
-      return JSON.parse(response.body)
+      begin
+        result = JSON.parse(response.body)
+      rescue Exception => e
+        puts 'Encountered following exception' + e
+        puts 'getJsonByPost failed - The following input returned no parseable JSON'
+        puts url
+        puts text
+      end
+
+      return result
     end      
       
     def getCompleteNextUrl(nextUrl, isKeyProvided)
