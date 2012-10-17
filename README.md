@@ -6,6 +6,7 @@
 	
 :To-Do List
 
-	1. Figure out how to use rails_runner and create a method/class which can pre-populate the database
-	2. Make a method which is smart enough to just get any NEW issues from the WaPo Issue Engine API
-	3. Remove hard-coded issue engine API urls
+	1. Fix details page (should happen soon)
+	2. Figure out how to use rails_runner and create a method/class which can pre-populate the database
+	3. Make a method which is smart enough to just get any NEW issues from the WaPo Issue Engine API
+	4. Remove hard-coded issue engine API urls

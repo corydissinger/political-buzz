@@ -1,3 +1,6 @@
+require 'json'
+require 'net/http'
+
 class ApiRequest
   $urlEngine = nil
   
@@ -42,6 +45,14 @@ class ApiRequest
     end
   end
 
+  def getMasterIssueJson
+    $anUrl = $urlEngine.getMasterIssueListUrl
+    
+    $jsonResult = getJson($anUrl)
+    
+    return $jsonResult
+  end
+
   def getIssueResults(anIssue)
     $anUrl = $urlEngine.getUrlForIssue(anIssue)
     
@@ -83,13 +94,17 @@ class ApiRequest
   end
   
   def getJson(targetUrl)
-    url = URI.parse(URI.encode(targetUrl))
-    resp = Net::HTTP.get_response(url) 
-    data = resp.body
+    uri = URI.parse(targetUrl)
+    request = Net::HTTP::Get.new("#{uri.path}?#{uri.query}")
+    
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.read_timeout = 500
+    resp = http.request(request)
+     
     result = {} 
 
     begin
-      result = JSON.parse(data)    
+      result = JSON.parse(resp.body)    
     rescue Exception => e
       Rails.logger.info '-------BEGIN EXCEPTION--------'      
       Rails.logger.info 'Encountered following exception' + e
@@ -97,18 +112,19 @@ class ApiRequest
       Rails.logger.info targetUrl
       Rails.logger.info '-------END EXCEPTION--------'
     end
-
+    
     return result    
   end
     
-  def getJsonByPost(text, url)
-    uri = URI.parse(url)
+  def getJsonByPost(text, targetUrl)
+    uri = URI.parse(targetUrl)
     params = {'doc' => {'body' => text}.to_json}
-
+    
     request = Net::HTTP::Post.new("#{uri.path}?#{uri.query}")
     request.set_form_data(params)
     
     http = Net::HTTP.new(uri.host, uri.port)
+    http.read_timeout = 500
     response = http.request(request)
     result = {}
 
@@ -118,7 +134,7 @@ class ApiRequest
       Rails.logger.info '-------BEGIN EXCEPTION--------'
       Rails.logger.info 'Encountered following exception' + e
       Rails.logger.info 'getJsonByPost failed - The following input returned no parseable JSON'
-      Rails.logger.info url
+      Rails.logger.info uri
       Rails.logger.info text
       Rails.logger.info '-------END EXCEPTION--------'
     end

@@ -19,11 +19,15 @@ class UrlEngine
   SEARCH_PARMS = '&startDate=2012-01-01&endDate=2012-10-06&sort=relevance&output=JSON&numResults=5&searchType=mainText'
   TERM = '&searchTerm='
 
+  def getMasterIssueListUrl
+    return WPOST_BASE_URL + BY_ISSUE + WPOST_API_KEY_NO_SLASH 
+  end
+
   def getNprArticlesUrl(entity)
     return NPR_STEM + SEARCH_PARMS + TERM + entity + NPR_KEY       
   end      
 
-  def troveAnalysis()
+  def troveAnalysis
     return WPOST_BASE_URL + TROVE + WPOST_API_KEY_NO_SLASH
   end
 
