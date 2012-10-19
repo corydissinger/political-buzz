@@ -1,4 +1,5 @@
 require 'json'
+require 'httparty'
 require 'net/http'
 
 class ApiRequest
@@ -94,17 +95,12 @@ class ApiRequest
   end
   
   def getJson(targetUrl)
-    uri = URI.parse(targetUrl)
-    request = Net::HTTP::Get.new("#{uri.path}?#{uri.query}")
-    
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.read_timeout = 500
-    resp = http.request(request)
+    response = HTTParty.get(targetUrl)
      
     result = {} 
 
     begin
-      result = JSON.parse(resp.body)    
+      result = JSON.parse(response.body)    
     rescue Exception => e
       Rails.logger.info '-------BEGIN EXCEPTION--------'      
       Rails.logger.info 'Encountered following exception' + e
@@ -117,15 +113,11 @@ class ApiRequest
   end
     
   def getJsonByPost(text, targetUrl)
-    uri = URI.parse(targetUrl)
+    #TODO - Clean this up and post without timing out, EVER!
     params = {'doc' => {'body' => text}.to_json}
     
-    request = Net::HTTP::Post.new("#{uri.path}?#{uri.query}")
-    request.set_form_data(params)
-    
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.read_timeout = 500
-    response = http.request(request)
+    response = HTTParty.post(targetUrl,
+                       :body => params)
     result = {}
 
     begin
@@ -141,4 +133,13 @@ class ApiRequest
 
     return result
   end      
+
+  class Trove
+    include HTTParty
+    format :json
+    
+    def self.text_analysis(fullurl, text)
+      
+    end
+  end
 end
