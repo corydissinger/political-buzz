@@ -16,7 +16,7 @@ class UrlEngine
   # npr constants
   NPR_KEY = '&apiKey=MDEwMTA0MzEwMDEzNDc4MjkyNzBiZjJmNw001'
   NPR_STEM = 'http://api.npr.org/query?'
-  SEARCH_PARMS = '&startDate=2012-01-01&endDate=2012-10-06&sort=relevance&output=JSON&numResults=5&searchType=mainText'
+  SEARCH_PARMS = '&startDate=2012-01-01&endDate=2012-12-31&sort=relevance&output=JSON&numResults=5&searchType=mainText'
   TERM = '&searchTerm='
 
   def getMasterIssueListUrl

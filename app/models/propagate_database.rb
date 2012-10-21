@@ -56,7 +56,8 @@ class PropagateDatabase
       
       process_category_articles($categoryObj, articles)
       
-      if $categoryObj.valid?  
+      if $categoryObj.valid?
+        $categoryObj.name.gsub!('%20',/\s+/)  
         $categoryObj.save
         Rails.logger.info 'Added category' + $categoryObj.name
       end      

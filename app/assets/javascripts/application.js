@@ -20,6 +20,7 @@ $(document).ready(function() {
   	var statementsNice = $("#statement-scrollable").niceScroll({touchbehavior:true,cursoropacitymax:0.6,cursorwidth:8});
   	var detailsNice = $('#details-container').niceScroll({touchbehavior:true,cursoropacitymax:0.6,cursorwidth:8});
   	//masonry effect for statements
+  	
   	$(function(){
 	  	$("#statement-canvas").masonry({
 	  		itemSelector: '.statement',

@@ -13,13 +13,18 @@
 	</div>
 	<div class="relavent-links">
 		<h1>Categories Found From Statement</h1>
+		<% if @categories.empty? %>
+			<div>No Categories Found</div>
+		<% else %>
+			<div> <%= puts @categories %></div>
+		<%end%>
 		<% @categories.each do |category| %>
 			<div class="category">
 				<h2><%= category.name %></h2>
 				<div class="links">
 					<% if not category.articles.empty? %>
-						<% category.articles.each do |url|%>
-							<a style="text-align: center;" href="<%= url %>"><%= url %></a></br>					
+						<% category.articles.each do |article|%>
+							<a style="text-align: center;" href="<%= article.url %>"><%= article.url %></a></br>					
 						<% end %>
 					<% else %>
 						No NPR articles found for this category!
