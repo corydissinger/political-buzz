@@ -1,6 +1,5 @@
 require 'json'
 require 'httparty'
-require 'net/http'
 
 class ApiRequest
   $urlEngine = nil
@@ -71,6 +70,11 @@ class ApiRequest
   end
   
   def getNprArticles(entity)
+    if entity.length > 40
+      Rails.logger.info 'Encountered strange entity from trove' + entity
+      return {}
+    end
+    
     entity.gsub!(/\s+/,'%20')
     $nprUrl = $urlEngine.getNprArticlesUrl(entity)
     
@@ -95,7 +99,15 @@ class ApiRequest
   end
   
   def getJson(targetUrl)
-    response = HTTParty.get(targetUrl)
+    url = URI.encode(targetUrl)
+    
+    begin
+      response = HTTParty.get(url)
+    rescue Timeout::Error
+      Rails.logger.info '-------BEGIN EXCEPTION--------'
+      Rails.logger.info 'Timed out for URL: ' + url
+      Rails.logger.info '-------END EXCEPTION--------'  
+    end
      
     result = {} 
 
@@ -105,7 +117,7 @@ class ApiRequest
       Rails.logger.info '-------BEGIN EXCEPTION--------'      
       Rails.logger.info 'Encountered following exception' + e
       Rails.logger.info 'getJsonBy failed - The following input returned no parseable JSON'
-      Rails.logger.info targetUrl
+      Rails.logger.info url
       Rails.logger.info '-------END EXCEPTION--------'
     end
     
@@ -113,11 +125,19 @@ class ApiRequest
   end
     
   def getJsonByPost(text, targetUrl)
-    #TODO - Clean this up and post without timing out, EVER!
+    url = URI.encode(targetUrl)
     params = {'doc' => {'body' => text}.to_json}
     
-    response = HTTParty.post(targetUrl,
-                       :body => params)
+    begin
+      response = HTTParty.post(url,
+                         :body => params)
+    rescue Timeout::Error
+      Rails.logger.info '-------BEGIN EXCEPTION--------'
+      Rails.logger.info 'Timed out for post on URL ' + url
+      Rails.logger.info 'Text body was: ' + text
+      Rails.logger.info '-------END EXCEPTION--------'
+    end                         
+                         
     result = {}
 
     begin
@@ -126,7 +146,7 @@ class ApiRequest
       Rails.logger.info '-------BEGIN EXCEPTION--------'
       Rails.logger.info 'Encountered following exception' + e
       Rails.logger.info 'getJsonByPost failed - The following input returned no parseable JSON'
-      Rails.logger.info uri
+      Rails.logger.info url
       Rails.logger.info text
       Rails.logger.info '-------END EXCEPTION--------'
     end
@@ -134,12 +154,4 @@ class ApiRequest
     return result
   end      
 
-  class Trove
-    include HTTParty
-    format :json
-    
-    def self.text_analysis(fullurl, text)
-      
-    end
-  end
 end

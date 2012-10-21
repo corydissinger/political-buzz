@@ -1,24 +1,24 @@
 <div class="details-container" id="details-container">
 	<div class="details-header">
 		<div class="display-name">
-		Speaker: <%= @statementdetails['speaker']['display_name'] %>	
+		Speaker: <%= @statement.speaker %>	
 		</div>		
 		<div class="date">
-		Date Spoken: <%= @statementdetails['date'] %>
+		Date Spoken: <%= @statement.date %>
 		</div>
 	</div>
 	<div class="details-body">
-		<p class="details-text">"<%= @statementdetails['text'] %>"</p>
-		<a style="text-align: center;" href="<%= @statementdetails['transcript_source_url']%>">Transcript Source</a>		
+		<p class="details-text">"<%= @statement.transcript %>"</p>
+		<a style="text-align: center;" href="<%= @statement.url %>">Transcript Source</a>		
 	</div>
 	<div class="relavent-links">
 		<h1>Categories Found From Statement</h1>
-		<% @categoryUrlHash.each_pair do |key, val| %>
+		<% @categories.each do |category| %>
 			<div class="category">
-				<h2><%= key %></h2>
+				<h2><%= category.name %></h2>
 				<div class="links">
-					<% if not val.empty? %>
-						<% val.each do |url|%>
+					<% if not category.articles.empty? %>
+						<% category.articles.each do |url|%>
 							<a style="text-align: center;" href="<%= url %>"><%= url %></a></br>					
 						<% end %>
 					<% else %>

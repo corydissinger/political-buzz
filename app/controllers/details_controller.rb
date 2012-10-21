@@ -1,7 +1,6 @@
 class DetailsController < ApplicationController
   def index
-    grabber = ApiInterface::JsonProvider.new
-    @statementdetails = grabber.getStatementById(params[:id])
-    @categoryUrlHash = grabber.getEntityUrlHashForStatement(@statementdetails['text'])    
+    @statement = Statement.where("id = ?", params[:id]).first
+    @categories = @statement.categories
   end
 end
