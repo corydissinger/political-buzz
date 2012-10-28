@@ -32,19 +32,15 @@ ActiveRecord::Schema.define(:version => 20121013230625) do
 
   add_index "categories_statements", ["category_id", "statement_id"], :name => "index_categories_statements_on_category_id_and_statement_id", :unique => true
 
+  create_table "lasturls", :force => true do |t|
+    t.string "url"
+  end
+
   create_table "statements", :force => true do |t|
-    t.integer "topic_id"
-    t.text    "transcript"
-    t.string  "url"
-    t.string  "speaker"
-    t.date    "date"
+    t.text   "transcript"
+    t.string "url"
+    t.string "speaker"
+    t.date   "date"
   end
-
-  create_table "topics", :force => true do |t|
-    t.string  "name"
-    t.integer "count"
-  end
-
-  add_index "topics", ["name"], :name => "index_topics_on_name", :unique => true
 
 end

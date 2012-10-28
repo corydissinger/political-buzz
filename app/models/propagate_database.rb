@@ -3,37 +3,62 @@ class PropagateDatabase
   
   def self.initial_populate
     $apiRequest = ApiRequest.new
-    $jsonObj = $apiRequest.getMasterIssueJson
+    $jsonObj = $apiRequest.getFirstStatementJson
     
-    $issuesObject = $jsonObj['objects']
-    
-    $issuesObject.each do |issue|
-      hash = {'name' => issue['name'], 'count' => issue['statement_count']}
-      $topicObj = Topic.new(hash)
+    iterate_through_api($jsonObj)
+  end
+
+  def self.update_db
+    $apiRequest = ApiRequest.new
+    $theCurrentUrl = Lasturl.all.first
+    Rails.logger.info "Continued from URL: " + $theCurrentUrl.url
+    $jsonObj = $apiRequest.getNextResults($theCurrentUrl.url)
       
-      $statementsJson = $apiRequest.getNextResults(issue['statement_url'], false)
+    iterate_through_api($jsonObj)   
+  end
+
+  def self.iterate_through_api(jsonObj)
+    $nextLink = nil
+    $hasNextLink = true
+    
+    while $hasNextLink
+      if $nextLink.nil?
+        $nextLink = process_statements(jsonObj)
+      else
+        $nextJsonObj = $apiRequest.getNextResults($nextLink)
+        $nextLink = process_statements($nextJsonObj)
+        Rails.logger.info 'Processing statements from: ' + $nextLink
+        
+        #TODO Is there a better way to maintain this?
+        $lastUrl = Lasturl.all.first
+        
+        if not $lastUrl.nil?
+          Lasturl.delete($lastUrl.id)
+        end
           
-      process_topic_statements($topicObj, $statementsJson)
-      
-      $topicObj.save
-    end
+        hash = {'url' => $nextLink}
+        $lastUrl = Lasturl.new(hash)
+        $lastUrl.save
+      end
+          
+      if $nextLink.nil?
+        $hasNextLink = false
+      end
+    end    
   end
   
-  def self.process_topic_statements(topic, statementsJson)
+  def self.process_statements(statementsJson)
     $nextLink = statementsJson['meta']['next']
     $statements = statementsJson['objects']    
     
     $statements.each do |statement|
-      process_a_statement(topic, statement)
+      process_a_statement(statement)
     end
-    
-    if not $nextLink.nil?
-      $nextStatementJson = $apiRequest.getNextResults($nextLink, true)
-      process_topic_statements(topic, $nextStatementJson)
-    end
+
+    return $nextLink    
   end
   
-  def self.process_a_statement(topic, aStatement)
+  def self.process_a_statement(aStatement)
     $transcriptText = aStatement['text']
     
     hash = {'transcript' => $transcriptText, 
@@ -41,11 +66,13 @@ class PropagateDatabase
             'date' => aStatement['date'],
             'speaker' => aStatement['speaker']['display_name']}
             
-    $statementObj = topic.statements.build(hash)
+    $statementObj = Statement.new(hash)
     
     process_statement_categories($transcriptText, $statementObj)
     
-    $statementObj.save    
+    if $statementObj.valid?
+      $statementObj.save
+    end    
   end
   
   def self.process_statement_categories(aTranscript, aStatement)
@@ -55,9 +82,11 @@ class PropagateDatabase
       $categoryObj = aStatement.categories.build(:name => category)
       
       process_category_articles($categoryObj, articles)
+
+      $tempName = category.dup
+      $categoryObj.name = $tempName.gsub!('%20',' ')
       
       if $categoryObj.valid?
-        $categoryObj.name.gsub!('%20',/\s+/)  
         $categoryObj.save
         Rails.logger.info 'Added category' + $categoryObj.name
       end      

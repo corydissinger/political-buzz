@@ -16,7 +16,7 @@ class ApiRequest
     $categoryUrlPairs = Hash.new
     
     #TODO - Is it possible to parse NPR JSON less confusingly? 
-    #       Don't bash me for this until you try interpreting it! 
+    #       Don't bash me for this until you try interpreting NPR json! 
     $entities.each do |entity|
       $aTopic = entity['resource']['name']
       $nprList = getNprArticles($aTopic)
@@ -45,8 +45,8 @@ class ApiRequest
     end
   end
 
-  def getMasterIssueJson
-    $anUrl = $urlEngine.getMasterIssueListUrl
+  def getFirstStatementJson
+    $anUrl = $urlEngine.getFirstStatementListUrl
     
     $jsonResult = getJson($anUrl)
     
@@ -61,8 +61,8 @@ class ApiRequest
     return $jsonResult  
   end
 
-  def getNextResults(nextUrl, isKeyProvided)
-    $anUrl = $urlEngine.getNextIssueUrl(nextUrl, isKeyProvided)
+  def getNextResults(nextUrl)
+    $anUrl = $urlEngine.getNextIssueUrl(nextUrl)
     
     $jsonResult = getJson($anUrl)
     
@@ -70,11 +70,6 @@ class ApiRequest
   end
   
   def getNprArticles(entity)
-    if entity.length > 40
-      Rails.logger.info 'Encountered strange entity from trove' + entity
-      return {}
-    end
-    
     entity.gsub!(/\s+/,'%20')
     $nprUrl = $urlEngine.getNprArticlesUrl(entity)
     
@@ -100,13 +95,26 @@ class ApiRequest
   
   def getJson(targetUrl)
     url = URI.encode(targetUrl)
-    
+
+    $redoCounter = 0
+     
     begin
       response = HTTParty.get(url)
     rescue Timeout::Error
       Rails.logger.info '-------BEGIN EXCEPTION--------'
       Rails.logger.info 'Timed out for URL: ' + url
       Rails.logger.info '-------END EXCEPTION--------'  
+    rescue EOFError
+      
+      if $redoCounter < 3
+        $redoCounter += 1
+        redo
+      else
+        Rails.logger.info '-------BEGIN EXCEPTION--------'
+        Rails.logger.info 'EOFerror after 3 attempts on URL ' + url
+        Rails.logger.info '-------END EXCEPTION--------'
+        $redoCounter = 0    
+      end
     end
      
     result = {} 
@@ -136,6 +144,17 @@ class ApiRequest
       Rails.logger.info 'Timed out for post on URL ' + url
       Rails.logger.info 'Text body was: ' + text
       Rails.logger.info '-------END EXCEPTION--------'
+    rescue EOFError
+      
+      if $redoCounter < 3
+        $redoCounter += 1
+        redo
+      else
+        Rails.logger.info '-------BEGIN EXCEPTION--------'
+        Rails.logger.info 'EOFerror after 3 attempts on URL ' + url
+        Rails.logger.info '-------END EXCEPTION--------'
+        $redoCounter = 0    
+      end      
     end                         
                          
     result = {}
