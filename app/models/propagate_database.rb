@@ -27,7 +27,14 @@ class PropagateDatabase
       else
         $nextJsonObj = $apiRequest.getNextResults($nextLink)
         $nextLink = process_statements($nextJsonObj)
-        Rails.logger.info 'Processing statements from: ' + $nextLink
+        
+        if $nextLink.nil?
+          Rails.logger.info 'Next link is not available'
+          return
+        else
+          Rails.logger.info 'Processing statements from: ' + $nextLink  
+        end
+        
         
         #TODO Is there a better way to maintain this?
         $lastUrl = Lasturl.all.first

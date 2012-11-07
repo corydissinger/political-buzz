@@ -2,7 +2,7 @@ class TopicsController < ApplicationController
   # GET /topics
   # GET /topics.json
   def index
-    @topics = Topic.order("count DESC").all
+    @topics = Category.order("name DESC").all
   end
 
 end
