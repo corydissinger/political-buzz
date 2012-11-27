@@ -4,14 +4,14 @@ class UrlEngine
   TROVE = 'trove/v1/analysis'
   BY_STATEMENT = 'politics/transcripts/api/v1/statement/'
   PHRASES_BY_ENTITY = '/phrases/legislator.json?'
-  WPOST_API_KEY = '&key=AD3597EC-2C77-4D91-B9FD-2071AD2FD9E3'
-  WPOST_API_KEY_ONLY = '/?key=AD3597EC-2C77-4D91-B9FD-2071AD2FD9E3'
-  WPOST_API_KEY_NO_SLASH = '?key=AD3597EC-2C77-4D91-B9FD-2071AD2FD9E3'
+  WPOST_API_KEY = '&key='
+  WPOST_API_KEY_ONLY = '/?key='
+  WPOST_API_KEY_NO_SLASH = '?key='
   LIMIT = '&limit=30'
   ORDER_RECENT = '&order_by=-date'
 
   # npr constants
-  NPR_KEY = '&apiKey=MDEwMTA0MzEwMDEzNDc4MjkyNzBiZjJmNw001'
+  NPR_KEY = '&apiKey='
   NPR_STEM = 'http://api.npr.org/query?'
   SEARCH_PARMS = '&startDate=2012-01-01&endDate=2012-12-31&sort=relevance&output=JSON&numResults=5&searchType=mainText'
   TERM = '&searchTerm='
